@@ -1,0 +1,28 @@
+.textarea_small {
+    height: 6em;
+    font-size: .875rem;
+}
+
+.pkp_list_box {
+    border: 1px solid #ddd;
+    margin-bottom: 1.3rem;
+    padding: 0.3rem 1rem;
+    border-radius: 2px;
+}
+
+.expandable {
+    max-height: 7rem;
+    overflow-y: scroll;
+}
+
+.textAreaLabel {
+    font-weight: 700;
+}
+
+.recommended-reviewers-wrapper, .excluded-reviewers-wrapper {
+    & div {
+        & textarea {
+            max-width: initial !important;
+        }
+    }
+}
