@@ -1,5 +1,5 @@
 $(document).ready(function () {
-	let incRev = $(".recommended-reviewers-wrapper > div > textarea");
+	let incRev = $(".included-reviewers-wrapper > div > textarea");
 	incRev.on("change", function () {
 		setData("includedReviewers", incRev.val());
 	});

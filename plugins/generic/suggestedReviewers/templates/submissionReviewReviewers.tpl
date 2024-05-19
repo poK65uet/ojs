@@ -1,8 +1,8 @@
 {** * plugins/generic/suggestedReviewers/templates/submissionReviewReviewers.tpl
-* * Copyright (c) 2014-2022 Simon Fraser University * Copyright (c) 2003-2022
+* * Copyright (c) 2014-2023 Simon Fraser University * Copyright (c) 2003-2023
 John Willinsky * Distributed under the GNU GPL v3. For full terms see the file
-docs/COPYING. * * The template to review the reviewer suggestions data in the
-submission wizard * before completing the submission *}
+docs/COPYING. * * Settings form for the pluginTemplate plugin. *}
+
 <div class="submissionWizard__reviewPanel">
   <div class="submissionWizard__reviewPanel__header">
     <h3 id="review-suggested-reviewers">

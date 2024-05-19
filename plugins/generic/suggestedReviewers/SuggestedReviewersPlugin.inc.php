@@ -1,157 +1,138 @@
 <?php
 
 /**
- * @file plugins/generic/compmetingInterests/SuggestedReviewersPlugin.inc.php
+ * @file SuggestedReviewersPlugin.php
  *
- * Copyright (c) 2014-2019 Simon Fraser University
- * Copyright (c) 2003-2019 John Willinsky
- * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
+ * Copyright (c) 2017-2023 Simon Fraser University
+ * Copyright (c) 2017-2023 John Willinsky
+ * Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
  *
  * @class SuggestedReviewersPlugin
- * @ingroup plugins_generic_SuggestedReviewersPlugin
  *
- * @brief SuggestedReviewers plugin class
+ * @brief Plugin class for the SuggestedReviewers plugin.
  */
 
-import('lib.pkp.classes.plugins.GenericPlugin');
-
 use APP\core\Application;
-use APP\facades\Repo;
 use APP\pages\submission\SubmissionHandler;
 use APP\template\TemplateManager;
 use PKP\components\forms\FieldOptions;
-use PKP\plugins\Hook;
+use PKP\components\forms\FormComponent;
 use PKP\facades\Locale;
-use PKP\security\Role;
+use PKP\plugins\GenericPlugin;
+use PKP\plugins\Hook;
 
 class SuggestedReviewersPlugin extends GenericPlugin
 {
     /**
      * @copydoc Plugin::register()
+     *
+     * @param null|mixed $mainContextId
      */
-    function register($category, $path, $mainContextId = null)
+    public function register($category, $path, $mainContextId = null)
     {
-        $success = parent::register($category, $path, $mainContextId);
-        if ($success && $this->getEnabled($mainContextId)) {
-            // // Get the plugin DAO
-            // $this->import('SuggestedReviewersDAO');
-            // $suggestedReviewersDao = new SuggestedReviewersDAO();
-            // DAORegistry::registerDAO('SuggestedReviewersDAO', $suggestedReviewersDao);
-
-            Hook::add('TemplateManager::display', [$this, 'addToSubmissionWizardSteps']);
-            Hook::add('Template::SubmissionWizard::Section::Review', [$this, 'addToSubmissionWizardReviewTemplate']);
+        $success = parent::register($category, $path);
+        if ($success && $this->getEnabled()) {
+            // Add hooks
+            Hook::add('TemplateManager::display', $this->addToSubmissionWizardSteps(...));
+            Hook::add('Template::SubmissionWizard::Section::Review', $this->addToSubmissionWizardReviewTemplate(...));
 
             // Override OJS templates
-            Hook::add('TemplateResource::getFilename', [$this, '_overridePluginTemplates']);
+            Hook::add('TemplateResource::getFilename', $this->_overridePluginTemplates(...));
 
-            // Hooks for Submission form step 3
-            Hook::add('Schema::get::publication', [$this, 'addToPublicationSchema']);
+            // Hooks for submission form
+            Hook::add('Schema::get::publication', $this->addToPublicationSchema(...));
 
-            // Hook for Submission Workflow Add Reviewer
-            Hook::add('advancedsearchreviewerform::display', [$this, 'loadTemplateData']);
+            // Hook for submission workflow add reviewer
+            Hook::add('advancedsearchreviewerform::display', $this->loadTemplateData(...));
 
-            // Hooks for Workflow Settings Reviews Tab
-            Hook::add('Schema::get::context', [$this, 'addToContextSchema']);
-            Hook::add('Form::config::before', [$this, 'addToForm']);
-
-            // Tracking sending emails (use listener for 3.4, hook removed)
-            Hook::add('Mail::send', [$this, 'sendMail']);
+            // Hooks for workflow settings reviews Tab
+            Hook::add('Schema::get::context', $this->addToContextSchema(...));
+            Hook::add('Form::config::before', $this->addToReviewSetupForm(...));
 
         }
         return $success;
     }
 
-    /****************/
-    /**** Plugin ****/
-    /****************/
-
     /**
-     * @copydoc Plugin::isSitePlugin()
+     * Check if the plugin is a site-wide plugin
+     *
+     * @return bool
      */
-    function isSitePlugin()
+    public function isSitePlugin()
     {
-        // This is a site-wide plugin.
         return true;
     }
 
     /**
-     * @copydoc Plugin::getDisplayName()
      * Get the plugin name
+     *
+     * @return string
      */
-    function getDisplayName()
+    public function getDisplayName()
     {
         return __('plugins.generic.suggestedReviewers.displayName');
     }
 
     /**
-     * @copydoc Plugin::getDescription()
-     * Get the description
+     * Get the plugin description
+     *
+     * @return string
      */
-    function getDescription()
+    public function getDescription()
     {
         return __('plugins.generic.suggestedReviewers.description');
     }
 
     /**
-     * @copydoc Plugin::getInstallSitePluginSettingsFile()
-     * get the plugin settings
-     */
-    function getInstallSitePluginSettingsFile()
-    {
-        return $this->getPluginPath() . '/settings.xml';
-    }
-
-    /**
-     * Return the location of the plugin's CSS file
+     * Return the path to the plugin's stylesheet
      *
      * @return string
      */
-    function getStyleSheet()
+    public function getStyleSheet()
     {
         return $this->getPluginPath() . '/css/suggestedReviewers.css';
     }
 
-    /**********************************************/
-    /**** Workflow > Settings > Review > Setup ****/
-    /**********************************************/
-
     /**
      * Extend the Publication entity's schema with an suggestedReviewers property
+     *
      * @param $hookName string
      * @param $args array
-     *
      */
-    public function addToContextSchema($hookName, $args)
+    public function addToContextSchema(string $hookName, array $args)
     {
-
         $schema = $args[0];
-
-        $schema->properties->enableSuggestedRevieweres = new stdClass();
-        $schema->properties->enableSuggestedRevieweres->type = 'array';
-        $schema->properties->enableSuggestedRevieweres->items = new stdClass();
-        $schema->properties->enableSuggestedRevieweres->items->type = 'string';
-        $schema->properties->enableSuggestedRevieweres->items->validation = ['in:reviewersToIncluded,reviewersToExcluded'];
+        $schema->properties->enableSuggestedRevieweres = (object) [
+            'type' => 'array',
+            'items' => (object) [
+                'type' => 'string',
+                'validation' => ['in:reviewersToIncluded,reviewersToExcluded']
+            ]
+        ];
     }
 
     /**
-     * Extend Setup form to add suggestedReviewers input field
+     * Add suggestedReviewers input field to the review setup form
+     *
      * @param $hookName string
      * @param $form object
-     *
      */
-    public function addtoForm($hookName, $form)
+    public function addToReviewSetupForm(string $hookName, FormComponent $form)
     {
 
-        // Only modify Review Setup form
+        // Check if the form is the review setup form
         if (!defined('FORM_REVIEW_SETUP') || $form->id !== FORM_REVIEW_SETUP) {
             return;
         }
 
-        // get the context
-        $request = PKPApplication::get()->getRequest();
-        $context = $request->getContext();
+        // Get the context
+        $context = Application::get()->getRequest()->getContext();
 
-        // Add the fields to the form
+        if (!$context) {
+            return;
+        }
+
+        // Add the suggestedReviewers field to the form
         $form->addField(
             new FieldOptions('enableSuggestedRevieweres', [
                 'label' => __('manager.setup.reviewOptions.suggestedRevieweres.title'),
@@ -168,41 +149,44 @@ class SuggestedReviewersPlugin extends GenericPlugin
                 ],
                 'value' => $context->getData('enableSuggestedRevieweres') ? $context->getData('enableSuggestedRevieweres') : [],
             ]),
-            array(FIELD_POSITION_BEFORE, 'defaultReviewMode')
+            [FIELD_POSITION_BEFORE, 'defaultReviewMode']
         );
     }
 
     /**
-     * Extend the publication entity's schema with includedReviewers and excludedReviewers and recommendedReviewers properties
+     * Add plugin properties to the publication schema
+     *
      * @param $hookName string
      * @param $args array
-     *
      */
     public function addToPublicationSchema($hookName, $args)
     {
         $schema = $args[0];
 
-        $schema->properties->recommendedReviewers = new stdClass();
-        $schema->properties->recommendedReviewers->type = 'string';
-        $schema->properties->recommendedReviewers->multilingual = true;
-        $schema->properties->recommendedReviewers->validation = ['nullable'];
+        $schema->properties->includedReviewers = (object) [
+            'type' => 'string',
+            'multilingual' => true,
+            'validation' => ['nullable']
+        ];
 
-        $schema->properties->includedReviewers = new stdClass();
-        $schema->properties->includedReviewers->type = 'string';
-        $schema->properties->includedReviewers->multilingual = true;
-        $schema->properties->includedReviewers->validation = ['nullable'];
+        $schema->properties->excludedReviewers = (object) [
+            'type' => 'string',
+            'multilingual' => true,
+            'validation' => ['nullable']
+        ];
 
-        $schema->properties->excludedReviewers = new stdClass();
-        $schema->properties->excludedReviewers->type = 'string';
-        $schema->properties->excludedReviewers->multilingual = true;
-        $schema->properties->excludedReviewers->validation = ['nullable'];
+        // $schema->properties->recommendedReviewers = (object) [
+        //     'type' => 'string',
+        //     'multilingual' => true,
+        //     'validation' => ['nullable']
+        // ];
     }
 
     /**
-     * Insert template to review the suggested reviewers data in the submission wizard
+     * Add template to the suggested reviewers data in the submission wizard
      * before completing the submission
      */
-    function addToSubmissionWizardReviewTemplate($hookName, $params)
+    public function addToSubmissionWizardReviewTemplate($hookName, $params)
     {
         $request = Application::get()->getRequest();
         $journalId = $request->getContext()->getId();
@@ -224,7 +208,7 @@ class SuggestedReviewersPlugin extends GenericPlugin
                 'enableIncludedReviewers' => $enableIncludedReviewers,
                 'enableExcludedReviewers' => $enableExcludedReviewers
             ]);
-            $output =& $params[2];
+            $output = & $params[2];
 
             if ($step === 'editors') {
                 $output .= $templateMgr->fetch($this->getTemplateResource('submissionReviewReviewers.tpl'));
@@ -237,7 +221,7 @@ class SuggestedReviewersPlugin extends GenericPlugin
     /**
      * Add suggested reviewers section to the details step of the submission wizard
      */
-    function addToSubmissionWizardSteps($hookName, $params)
+    public function addToSubmissionWizardSteps($hookName, $params)
     {
         $request = Application::get()->getRequest();
 
@@ -274,13 +258,11 @@ class SuggestedReviewersPlugin extends GenericPlugin
             $fields = [];
             if ($enableIncludedReviewers) {
                 $fields[] = [
-                    'name' => "includedReviewers[$primaryLocale]",
+                    'name' => "includedReviewers[{$primaryLocale}]",
                     'component' => 'field-textarea',
-                    'class' => 'recommended-reviewers-wrapper',
+                    'class' => 'included-reviewers-wrapper',
                     'label' => __('manager.submissions.suggestedReviewers.included.label'),
                     'groupId' => 'default',
-                    'isRequired' => false,
-                    'isMultilingual' => false,
                     'value' => $includedReviewers ? implode('', $includedReviewers) : null,
                     'size' => 'small',
                 ];
@@ -288,13 +270,11 @@ class SuggestedReviewersPlugin extends GenericPlugin
 
             if ($enableExcludedReviewers) {
                 $fields[] = [
-                    'name' => "excludedReviewers[$primaryLocale]",
+                    'name' => "excludedReviewers[{$primaryLocale}]",
                     'component' => 'field-textarea',
                     'class' => 'excluded-reviewers-wrapper',
                     'label' => __('manager.submissions.suggestedReviewers.excluded.label'),
                     'groupId' => 'default',
-                    'isRequired' => false,
-                    'isMultilingual' => false,
                     'value' => $excludedReviewers ? implode('', $excludedReviewers) : null,
                     'size' => 'small'
                 ];
@@ -302,6 +282,7 @@ class SuggestedReviewersPlugin extends GenericPlugin
 
             $action = $request->getIndexUrl() . '/' . $request->getContext()->getPath() . '/api/v1/submissions/' . $submission->getId() . '/publications/' . $publication->getId();
             $steps = $templateMgr->getState('steps');
+            // error_log(print_r($steps, true));
             $steps = array_map(function ($step) use ($fields, $action, $primaryLocale) {
                 if ($step['id'] === 'editors') {
                     $locales = Locale::getSupportedFormLocales();
@@ -309,14 +290,12 @@ class SuggestedReviewersPlugin extends GenericPlugin
                         'key' => $primaryLocale,
                         'label' => $locales[$primaryLocale],
                     ];
-                    $otherLocaleKeys = [];
                     foreach ($locales as $key => $locale) {
                         if ($key !== $primaryLocale) {
                             $localesFormatted[] = [
                                 'key' => $key,
                                 'label' => $locale,
                             ];
-                            $otherLocaleKeys[$key] = '';
                         }
                     }
 
@@ -352,11 +331,10 @@ class SuggestedReviewersPlugin extends GenericPlugin
             ]);
 
             $templateMgr->addJavaScript(
-                'suggested-reviewers',
-                $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/SuggestedReviewers.js',
+                'suggestedReviewers',
+                $request->getBaseUrl() . '/' . $this->getPluginPath() . '/js/suggestedReviewers.js',
                 [
-                    'contexts' => 'backend',
-                    'priority' => TemplateManager::STYLE_SEQUENCE_LATE,
+                    'contexts' => ['backend'],
                 ]
             );
 
@@ -390,53 +368,36 @@ class SuggestedReviewersPlugin extends GenericPlugin
     }
 
     /**
-     * Add data to email templates.
+     * Override plugin templates Submissions > Workflow > Review
      *
-     * @param string $hookname
-     * @param array $args
-     *
-     */
-    public function sendMail($hookName, $args)
-    {
-        $form = &$args[0];
-        $submission = $form->submission;
-        if ($submission) {
-            $publication = $submission->getCurrentPublication();
-            $excludedReviewers = $publication->getLocalizedData('excludedReviewers');
-            $includedReviewers = $publication->getLocalizedData('includedReviewers');
-            $args[0]->privateParams['{$excludedReviewers}'] = htmlspecialchars($excludedReviewers);
-            $args[0]->privateParams['{$includedReviewers}'] = htmlspecialchars($includedReviewers);
-        }
-    }
-
-    /**
-     * Fired when add reviewer pop-up is called in Submissions > Workflow > Review.
-     *
-     * @param string $hookname
      * @param array $args
      *
      */
     public function loadTemplateData($hookName, $args)
     {
         // get the form
-        $request = PKPApplication::get()->getRequest();
-        $form =& $args[0];
+        $request = Application::get()->getRequest();
+        $form = & $args[0];
 
         // get suggestedReviewers values
         $publication = $form->getSubmission()->getCurrentPublication();
 
         $journalId = $request->getContext()->getId();
+
         $enableSuggestedReviewers = $this->suggestedReviewersEnabled($journalId);
+
         $enableIncludedReviewers = $this->includedReviewersEnabled($enableSuggestedReviewers);
         $enableExcludedReviewers = $this->excludedReviewersEnabled($enableSuggestedReviewers);
 
         $includedReviewers = $publication->getLocalizedData('includedReviewers');
         $excludedReviewers = $publication->getLocalizedData('excludedReviewers');
-        $recommendedReviewers = $this->getRecommendedReviewers($publication);
+
+        $recommendedReviewers = $enableSuggestedReviewers ? $this->getRecommendedReviewers($publication) : null;
 
         if (!$includedReviewers) {
             $includedReviewers = null;
         }
+
         if (!$excludedReviewers) {
             $excludedReviewers = null;
         }
@@ -449,28 +410,25 @@ class SuggestedReviewersPlugin extends GenericPlugin
         $authors = [];
         foreach ($publication->getData('authors') as $author) {
             $affiliations = [];
-            foreach ($author->getAffiliation(null) as $affiliationName) {
-                $affiliations[] = $affiliationName;
+            foreach ($author->getAffiliation(null) as $affiliation) {
+                $affiliations[] = $affiliation;
             }
-
             $authors[$author->getFullName()] = implode(',', array_filter($affiliations));
         }
 
-        $reviewerListData = $this->getReviewers($request);
-        // error_log(print_r($reviewerListData, true));
-
         $templateVars = [
+            'enableSuggestedReviewers' => $enableSuggestedReviewers,
             'enableIncludedReviewers' => $enableIncludedReviewers,
             'enableExcludedReviewers' => $enableExcludedReviewers,
             'includedReviewers' => $includedReviewers,
             'excludedReviewers' => $excludedReviewers,
             'recommendedReviewers' => $recommendedReviewers,
             'authors' => $authors,
-            'reviewerListData' => $reviewerListData,
+            // 'reviewerListData' => $reviewerListData,
         ];
 
         $templateMgr = TemplateManager::getManager($request);
-        $templateMgr->assign($templateVars);
+        // error_log("URL: " . $request->getBaseUrl() . '/' . $this->getStyleSheet());
         // $templateMgr->addStyleSheet(
         //     'suggestedReviewers',
         //     $request->getBaseUrl() . '/' . $this->getStyleSheet(),
@@ -478,9 +436,15 @@ class SuggestedReviewersPlugin extends GenericPlugin
         //         'contexts' => ['backend']
         //     ]
         // );
+        $templateMgr->assign($templateVars);
     }
 
 
+    /**
+     * Get the recommended reviewers from the recommendation API
+     *
+     * @param object $publication
+     */
     public function getRecommendedReviewers($publication)
     {
         $title = $publication->getLocalizedData('title');
@@ -508,7 +472,7 @@ class SuggestedReviewersPlugin extends GenericPlugin
         } else {
             $data = json_decode($response, true);
             $result = $data['result'];
-            $recommendedReviewers = array();
+            $recommendedReviewers = [];
 
             for ($i = 0; $i < count($result); $i++) {
                 $recommendedReviewers[] = $result[$i]['name'];
@@ -521,35 +485,34 @@ class SuggestedReviewersPlugin extends GenericPlugin
         return $recommendedReviewers;
     }
 
-    public function getReviewers($request)
-    {
-        $context = $request->getContext();
-        // $getReviewers = $request->getDispatcher()->url(
-        //     $request,
-        //     PKPApplication::ROUTE_API,
-        //     $context->getPath(),
-        //     'users/reviewers'
-        // );
+    // public function getReviewers($request)
+    // {
+    //     $context = $request->getContext();
+    //     // $getReviewers = $request->getDispatcher()->url(
+    //     //     $request,
+    //     //     PKPApplication::ROUTE_API,
+    //     //     $context->getPath(),
+    //     //     'users/reviewers'
+    //     // );
 
-        $reviewers = Repo::user()->getCollector()
-            ->filterByContextIds([$context->getId()])
-            ->filterByRoleIds([Role::ROLE_ID_REVIEWER])
-            ->includeReviewerData()
-            ->getMany();
+    //     $reviewers = Repo::user()->getCollector()
+    //         ->filterByContextIds([$context->getId()])
+    //         ->filterByRoleIds([Role::ROLE_ID_REVIEWER])
+    //         ->includeReviewerData()
+    //         ->getMany();
 
-        $result = array();
-        foreach ($reviewers as $reviewer) {
-            $reviewerId = $reviewer->getId();
-            error_log(print_r($reviewerId, true));
-            $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');/** @var \PKP\submission\reviewAssignment\ReviewAssignmentDAO $reviewAssignmentDao */
-            $reviewAssignment = $reviewAssignmentDao->getById($reviewerId);
-            $result[] = [
-                'id' => $reviewerId,
-                'name' => $reviewer->getFullName(),
-                'reviewAssignment' => $reviewAssignment
-            ];
-        }
-        return $result;
-    }
+    //     $result = array();
+    //     foreach ($reviewers as $reviewer) {
+    //         $reviewerId = $reviewer->getId();
+    //         error_log(print_r($reviewerId, true));
+    //         $reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');/** @var \PKP\submission\reviewAssignment\ReviewAssignmentDAO $reviewAssignmentDao */
+    //         $reviewAssignment = $reviewAssignmentDao->getById($reviewerId);
+    //         $result[] = [
+    //             'id' => $reviewerId,
+    //             'name' => $reviewer->getFullName(),
+    //             'reviewAssignment' => $reviewAssignment
+    //         ];
+    //     }
+    //     return $result;
+    // }
 }
-
