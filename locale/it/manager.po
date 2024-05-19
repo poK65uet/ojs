@@ -1,13 +1,14 @@
 # Lucia Steele <lucia.steele@aboutscience.eu>, 2021.
 # Fulvio Delle Donne <fulviodelledonne@libero.it>, 2022.
 # Stefan Schneider <mail@stefan-schneider.at>, 2023.
+# Leonardo Mancini <leonardo.mancini@unito.it>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-11-19T10:49:27+00:00\n"
-"PO-Revision-Date: 2023-06-19 14:25+0000\n"
-"Last-Translator: Stefan Schneider <mail@stefan-schneider.at>\n"
+"PO-Revision-Date: 2024-03-28 16:54+0000\n"
+"Last-Translator: Leonardo Mancini <leonardo.mancini@unito.it>\n"
 "Language-Team: Italian <http://translate.pkp.sfu.ca/projects/ojs/manager/it/>"
 "\n"
 "Language: it\n"
@@ -15,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.13.1\n"
+"X-Generator: Weblate 4.18.2\n"
 
 msgid "manager.distribution.access"
 msgstr "Accesso"
@@ -391,10 +392,10 @@ msgid "manager.sections.readingTools"
 msgstr "Strumenti di lettura"
 
 msgid "manager.sections.reviewed"
-msgstr "Peer Reviewed"
+msgstr "Revisionato dai pari"
 
 msgid "manager.sections.submissionIndexing"
-msgstr "Fanno parte del contenuto della rivista che non viene indicizzato"
+msgstr "Non saranno inclusi nell'indicizzazione della rivista"
 
 msgid "manager.sections.submissionReview"
 msgstr "Non saranno sottoposti a peer-review"
@@ -444,7 +445,7 @@ msgid "manager.setup.aboutItemContent"
 msgstr "Contenuto"
 
 msgid "manager.setup.addAboutItem"
-msgstr "Aggiungi una voce all'About"
+msgstr "Aggiungi una voce di \"About\""
 
 msgid "manager.setup.addChecklistItem"
 msgstr "Aggiungi una voce alla checklist"
@@ -489,8 +490,8 @@ msgstr "(compare nella sezione \"Informazioni sulla rivista\") "
 
 msgid "manager.setup.competingInterests.requireReviewers"
 msgstr ""
-"Richiedi ai revisori di allegare una dichiarazione di assenza di conflitto "
-"di interessi per ogni revisione che invieranno."
+"Richiedere ai revisori di allegare una dichiarazione di assenza di conflitto "
+"di interessi per ogni revisione sottoposta."
 
 msgid "manager.setup.history"
 msgstr "Storia della rivista"
@@ -520,7 +521,7 @@ msgstr ""
 "curatori di sezione abilitati a registrare solo i revisori."
 
 msgid "manager.setup.discipline"
-msgstr "Classificazione accademica"
+msgstr "Discipline accademiche e sottodiscipline"
 
 msgid "manager.setup.disciplineDescription"
 msgstr ""
@@ -532,7 +533,7 @@ msgstr ""
 "(Es. Storia; Pedagogia; Sociologia; Psicologia; Antropologia; Giurisprudenza)"
 
 msgid "manager.setup.disciplineProvideExamples"
-msgstr "Fornisci esempi di discipline accademiche rilevanti per questa rivista"
+msgstr "Fornire esempi di discipline accademiche rilevanti per questa rivista"
 
 msgid "manager.setup.displayCurrentIssue"
 msgstr "Mostra il sommario del fascicolo corrente (se disponibile)."
@@ -550,12 +551,11 @@ msgstr ""
 
 msgid "manager.setup.emailBounceAddress.disabled"
 msgstr ""
-"Per poter recapitare email non conseguibili ad un bounce address, "
+"Per inviare le e-mail non recapitabili a un indirizzo di rimbalzo, "
 "l'amministratore del sito deve abilitare l'opzione "
-"<code>allow_envelope_sender</code> nel file di configurazione di OJS. "
-"Configurazioni aggiuntive del server possono essere necessarie per "
-"supportare questa funzione (che potrebbe non essere disponibile su tutti i "
-"server), come indicato nella documentazione di OJS."
+"<code>allow_envelope_sender</code> nel file di configurazione del sito. "
+"Potrebbe essere necessaria una configurazione del server, come indicato "
+"nella documentazione di OJS."
 
 msgid "manager.setup.emails"
 msgstr "Firma delle email"
@@ -828,7 +828,7 @@ msgstr ""
 "del PKP PN."
 
 msgid "manager.setup.plnPluginArchiving"
-msgstr "PKP Preservation Network (PN)"
+msgstr "PKP Preservation Network (PKP PN)"
 
 msgid "manager.setup.plnPluginNotInstalled"
 msgstr ""
@@ -986,12 +986,12 @@ msgstr "Programma delle pubblicazioni"
 
 msgid "manager.setup.publicationScheduleDescription"
 msgstr ""
-"Gli articoli della rivista possono essere pubblicati tutti insieme, come "
-"parte di un numero completo con un sommario definitivo. In alternativa, "
-"possono essere pubblicati singolarmente, appena pronti, venendo aggiunti al "
-"sommario del volume \"corrente\". Indicate ai lettori, nella pagina delle "
-"informazioni sulla rivista, sia il il metodo utilizzato per la "
-"pubblicazione, sia la frequenza."
+"Gli articoli della rivista possono essere pubblicati collettivamente, come "
+"parte di un numero con un proprio indice. In alternativa è possibile "
+"pubblicare singoli articoli non appena pronti, aggiungendoli al sommario del "
+"volume “corrente”. Fornire ai lettori, nella sezione \"Informazioni sulla "
+"rivista\", una dichiarazione sul sistema che questa rivista utilizzerà e "
+"sulla frequenza di pubblicazione prevista."
 
 msgid "manager.setup.publicationScheduling"
 msgstr "Pianificazione delle pubblicazioni"
@@ -1249,7 +1249,7 @@ msgid "manager.statistics.statistics.numSubmissions"
 msgstr "Contributi totali ricevuti"
 
 msgid "manager.statistics.statistics.peerReviewed"
-msgstr "Peer reviewed"
+msgstr "Revisione tra pari effettuata"
 
 msgid "manager.statistics.statistics.registeredReaders"
 msgstr "Lettori registrati"
@@ -1493,7 +1493,7 @@ msgid "manager.subscriptions"
 msgstr "Abbonamenti"
 
 msgid "manager.individualSubscriptions"
-msgstr "Abbonamento individuale"
+msgstr "Abbonamenti individuali"
 
 msgid "manager.institutionalSubscriptions"
 msgstr "Abbonamento istituzionale"
@@ -1916,7 +1916,7 @@ msgstr ""
 "potranno navigare le riviste ospitate nel sito per categorie."
 
 msgid "grid.category.path"
-msgstr "Path"
+msgstr "Percorso"
 
 msgid "grid.action.addSection"
 msgstr "Aggiungi sezione"
@@ -2183,7 +2183,7 @@ msgid "stats.publications.countOfTotal"
 msgstr "{$count} di {$total} articoli"
 
 msgid "stats.publications.abstracts"
-msgstr "Abstracts"
+msgstr "Riassunti"
 
 msgid "stats.publications.galleys"
 msgstr "Files"
@@ -2231,9 +2231,8 @@ msgstr "Indirizzo URL della rivista"
 msgid "emailTemplate.variable.context.contactName"
 msgstr "Nome del contatto principale"
 
-#, fuzzy
 msgid "emailTemplate.variable.context.contextAcronym"
-msgstr "sigla della rivista"
+msgstr "Le iniziali della rivista"
 
 msgid "emailTemplate.variable.context.contextSignature"
 msgstr "Firma per email automatiche"
@@ -2242,7 +2241,7 @@ msgid "emailTemplate.variable.context.contactEmail"
 msgstr "Indirizzo email del contatto principale della rivista"
 
 msgid "emailTemplate.variable.context.mailingAddress"
-msgstr ""
+msgstr "Indirizzo della rivista"
 
 msgid "emailTemplate.variable.queuedPayment.itemName"
 msgstr "Nome per la tipologia di pagamento"
@@ -2259,7 +2258,7 @@ msgstr "Nome del sito, nel caso sia ospitata più di una rivista"
 msgid "emailTemplate.variable.subscription.subscriberDetails"
 msgstr ""
 "Il nome, l'affiliazione, il numero di telefono e l'indirizzo di posta "
-"elettronica dell'abbonato"
+"elettronica dell'abbonato/a"
 
 msgid "emailTemplate.variable.subscription.subscriptionSignature"
 msgstr "I dati di contatto del gestore dell'abbonamento"
@@ -2275,47 +2274,47 @@ msgstr ""
 "Riepilogo del tipo, del nome, della durata e del costo dell'abbonamento"
 
 msgid "emailTemplate.variable.subscription.membership"
-msgstr "Informazioni sull'iscrizione dell'abbonato"
+msgstr "Informazioni relative all'abbonamento"
 
-#, fuzzy
 msgid "emailTemplate.variable.subscription.institutionName"
 msgstr "Nome dell'istituzione"
 
-#, fuzzy
 msgid "emailTemplate.variable.subscription.institutionMailingAddress"
-msgstr "Indirizzo mail dell'istituzione"
+msgstr "Indirizzo dell'istituzione"
 
-#, fuzzy
 msgid "emailTemplate.variable.subscription.domain"
-msgstr "Dominio"
+msgstr "Il nome di dominio dell'indirizzo IP valido per questo abbonamento"
 
-#, fuzzy
 msgid "emailTemplate.variable.subscription.ipRanges"
-msgstr "Intervalli IP per l'autenticazione dell'abbonamento"
+msgstr "Intervalli di indirizzi IP per l'autenticazione dell'abbonamento"
 
 msgid "emailTemplate.variable.queuedPaymentUrl"
 msgstr ""
+"Indirizzo della pagina presso cui l'autore/rice può effettuare il pagamento"
 
 msgid "emailTemplate.variable.submissionGuidelinesUrl"
-msgstr ""
+msgstr "Indirizzo per le linee guida per le proposte"
 
 msgid "emailTemplate.variable.statisticsReportNotify.publicationStatsLink"
-msgstr ""
+msgstr "Il link alla pagina delle statistiche degli articoli pubblicati"
 
 msgid "emailTemplate.variable.issueId"
-msgstr ""
+msgstr "L'ID del fascicolo"
 
 msgid "mailable.statisticsReportNotify.description"
 msgstr ""
+"Questa e-mail viene inviata automaticamente ogni mese agli Editori e ai "
+"responsabili delle riviste per fornire loro una panoramica sullo stato del "
+"sistema."
 
 msgid "mailable.validateEmailContext.name"
-msgstr "Confermare Email (registrazione di rivista)"
+msgstr "Confermare e-mail (registrazione di una rivista)"
 
 msgid "mailable.validateEmailContext.description"
 msgstr ""
-"Questa mail è inviata in automatico ad un nuovo utente nel momento in cui si "
-"registra con la rivista e quando la configurazione richiede la conferma "
-"dell'indirizzo email."
+"Questa e-mail viene inviata automaticamente a un nuovo utente al momento "
+"della registrazione alla rivista, quando le impostazioni richiedono la "
+"convalida dell'indirizzo e-mail."
 
 msgid "doi.displayName"
 msgstr "DOI"
@@ -2336,7 +2335,7 @@ msgstr ""
 "Seguire il setup per essere in grado di gestire e utilizzare DOI in OJS:"
 
 msgid "doi.manager.settings.explainDois"
-msgstr "Seleziona gli oggetti che avranno un DOI:"
+msgstr "Selezionare gli oggetti che avranno un DOI:"
 
 msgid "doi.manager.settings.enableRepresentationDoi"
 msgstr "File principali degli articoli"
@@ -2650,19 +2649,25 @@ msgid "mailable.layoutComplete.name"
 msgstr "Gabbia completa"
 
 msgid "mailable.publicationVersionNotify.name"
-msgstr ""
+msgstr "Nuova versione creata"
 
 msgid "mailable.publicationVersionNotify.description"
 msgstr ""
+"Questa e-mail notifica automaticamente gli Editor assegnati quando viene "
+"creata una nuova versione della proposta editoriale."
 
 msgid "mailable.submissionNeedsEditor.description"
 msgstr ""
+"Questa email è inviata ai journal manager quando una nuova proposta è "
+"ricevuta e nessun editore è stato assegnato."
 
 msgid "mailable.paymentRequest.name"
-msgstr ""
+msgstr "Richiesta di pagamento"
 
 msgid "mailable.paymentRequest.description"
 msgstr ""
+"Questa email automatica viene inviata all'autore/rice per richiedere il "
+"pagamento della quota di pubblicazione quando la proposta è accettata."
 
 #~ msgid "manager.setup.metadata.coverage"
 #~ msgstr "Ambito"
@@ -2717,3 +2722,17 @@ msgstr ""
 
 #~ msgid "doi.manager.settings.enablePublicationDoi"
 #~ msgstr "Articoli"
+
+msgid "plugins.importexport.common.error.issueGalleyFileMissing"
+msgstr ""
+"Non è stato possibile esportare la gabbia {$id}, poiché il suo file non è "
+"stato trovato nel percorso \"{$path}\"."
+
+msgid "plugins.importexport.common.error.import.issueGalleyFileMissing"
+msgstr ""
+"Non è stato possibile importare una gabbia, poiché il suo file è mancante."
+
+msgid "plugins.importexport.common.error.issueCoverImageMissing"
+msgstr ""
+"L'immagine di copertina del numero {$id} non è stata esportata, poiché il "
+"file corrispondente non è stato trovato nel percorso \"{$path}\"."
